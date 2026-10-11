@@ -1,0 +1,7 @@
+.notes
+data/issues
+data/*.json
+data/*.log
+data/*.html
+data/*.md
+.env*.local

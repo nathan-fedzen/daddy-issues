@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Generated issues and scratch facts
+/data/issues/
+/data/facts-*.json
+/data/*.log
+/data/*.html
+/data/*.json
+/data/*.md
