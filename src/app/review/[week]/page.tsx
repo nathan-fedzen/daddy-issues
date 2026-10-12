@@ -54,7 +54,7 @@ export default async function ReviewPage({ params, searchParams }: PageProps<"/r
         </section>
         {issue && (
           <>
-            <h1 className="mt-8 mb-8 max-w-[14ch] font-display text-[clamp(2.5rem,9vw,4rem)] font-bold leading-[0.95]">
+            <h1 className="headline mt-8 mb-8 text-balance">
               {issue.headline}
             </h1>
             <Scoreboard facts={issue.facts} />

@@ -11,7 +11,7 @@ export function IssuePage({ issue, archive }: { issue: Issue; archive: IssueSumm
     <>
       <Masthead week={issue.week} date={formatDate(issue.publishedAt ?? issue.generatedAt)} />
       <main className="mx-auto max-w-[42rem] px-5 pb-20">
-        <h1 className="mt-8 mb-8 max-w-[14ch] font-display text-[clamp(2.5rem,9vw,4rem)] font-bold leading-[0.95] tracking-[-0.01em]">
+        <h1 className="headline mt-8 mb-8 text-balance">
           {issue.headline}
         </h1>
         <Scoreboard facts={issue.facts} />

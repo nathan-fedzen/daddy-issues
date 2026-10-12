@@ -37,7 +37,11 @@ async function main() {
     console.log(JSON.stringify(buildFacts(snapshot), null, 2));
     return;
   }
-  const issue = await generateIssue({ snapshot, publish: has("publish") ? true : undefined });
+  const issue = await generateIssue({
+    snapshot,
+    publish: has("publish") ? true : undefined,
+    overwritePublished: has("force"),
+  });
   console.log(`Week ${issue.week} ${issue.status}: ${issue.headline} (${gifCues(issue.source).length} gif cues)`);
   console.log(issue.markdown);
 }

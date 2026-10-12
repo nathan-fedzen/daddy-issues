@@ -7,7 +7,7 @@ export function Archive({ issues, currentWeek }: { issues: IssueSummary[]; curre
   if (others.length === 0) return null;
   return (
     <section aria-label="Back issues" className="mt-14">
-      <h2 className="relative border-t-2 border-ink pt-2 font-display text-[2rem] font-bold leading-none before:absolute before:-top-[2px] before:left-0 before:h-[6px] before:w-8 before:bg-orange">
+      <h2 className="section-head">
         Back issues
       </h2>
       <ol className="mt-2">

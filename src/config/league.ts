@@ -63,6 +63,7 @@ export const league: LeagueConfig = {
     "Dan and the robot: is Muse AI running his team yet, and would it have done better?",
     "Commissioner favoritism: Rudy and Tanner. Any week Tanner benefits from anything, note it with suspicion.",
     "Rudy is the commissioner and gets no mercy for it.",
+    "League rule: start a player who scores exactly 0 and you owe the group chat a video of yourself chugging a beer shirtless. Every zero-point starter gets named, and the owner gets reminded what they owe.",
   ],
   offLimits: [
     "Real-life jobs, money, health, family, or appearance. The Rudy and Tanner engagement is the one sanctioned exception, and only as a favoritism joke.",

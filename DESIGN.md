@@ -64,14 +64,15 @@ components:
 
 ## Overview
 
-A sports-bar back page, not a tech newsletter. The site exists to deliver one long roast a week and make it feel like an event. Two elements are loud: the nameplate at the top and the scoreboard ledger. Everything else is plain black text on white with heavy rules, so the writing carries the page. No cards, no shadows, no rounded corners, no gradients, no dark mode.
+A sports-bar back page, not a tech newsletter. The site exists to deliver one long roast a week and make it feel like an event. Three elements are loud: the black nameplate band at the top with the week stuck over its edge as an orange tag, the skewed navy scoreboard ribbon, and the GIFs styled as prints taped onto the page. Everything else is plain black text on white with heavy rules, so the writing carries the page. No cards, no shadows, no rounded corners, no gradients, no dark mode.
 
 ## Colors
 
 - **Paper (#FFFFFF)** is the page. Pure white, not cream.
 - **Ink (#000000)** is text and structural rules. Pure black, not a tinted near-black.
 - **Orange (#FB4F14)** is the only accent, borrowed from Mile High. It marks the issue rule under the nameplate, links, and nothing else.
-- **Navy (#0C2340)** appears exactly once per page, as the full-bleed scoreboard band. It is a band, not a theme.
+- **Navy (#0C2340)** appears exactly once per page, as the full-bleed scoreboard ribbon with a diagonal top edge. It is a band, not a theme.
+- **Ink as a fill** appears once, as the masthead band behind the white wordmark.
 - **Steel (#6E6E73)** carries metadata: dates, captions, small table text.
 - **Mist (#E6E6E6)** is the hairline inside tables only.
 
@@ -83,11 +84,11 @@ Body measure is 36rem. Section headings sit directly on a 2px ink rule with a sh
 
 ## Layout
 
-Single column, left-aligned, 42rem container with 20px side padding. The nameplate overflows its container on purpose: it is set at 19vw, cropped by the top edge, and sits on a 4px ink rule. The scoreboard breaks out of the column to full viewport width. Prose returns to the column. The standings table and the archive run at full container width with ruled rows. Section heights vary; nothing is equalized.
+Single column, left-aligned, 42rem container with 20px side padding. The nameplate is an SVG wordmark that scales to exactly the column width on every screen, white on a full-bleed ink band; the week tag overlaps the band's bottom edge. The scoreboard breaks out of the column to full viewport width with a diagonal top edge. Prose returns to the column. The standings table and the archive run at full container width with ruled rows. Section heights vary; nothing is equalized.
 
 ## Elevation & Depth
 
-None. Separation is done with rules: 4px ink under the nameplate, 2px ink under section heads, 1px mist between table rows. The navy band is a flat fill.
+Nothing soft. Separation is done with rules: 2px orange under the masthead meta line, 2px ink above section heads, 1px mist between table rows. GIFs carry a hard 8px orange offset shadow, a print device, never a blurred one.
 
 ## Shapes
 
@@ -95,9 +96,11 @@ Everything is square. No border radius anywhere, including buttons on the review
 
 ## Components
 
-- **Scoreboard row:** winner name top-left, loser name top-right, then two scores side by side. The winner's score is solid white at weight 900; the loser's is hollow (white text-stroke, transparent fill). The matchup's top scorer runs in a steel caption under the scores.
+- **Scoreboard row:** winner name top-left with a 4px orange left bar, loser name top-right, then two scores side by side. The winner's score is solid white at weight 900; the loser's is hollow (white text-stroke, transparent fill). The matchup's top scorer runs in a caption under the scores.
+- **Week tag:** orange block, Big Shoulders 900, pulled up over the masthead band edge.
+- **GIF print:** 3px ink border, 8px orange offset shadow, tilted about 1.5 degrees, alternating direction and side down the page.
 - **Section head:** level-two headings from the issue markdown, Big Shoulders 700 at 2rem, on a 2px rule with a 2rem orange tab.
-- **Standings table:** rank, team, record, points, streak, playoff odds. Numerals right-aligned and tabular.
+- **Standings table:** rank, team, record, points, streak, playoff odds; points and streak fold into the team cell on phones. Odds carry a 20% orange bar behind the number sized to the percentage.
 - **Archive list:** week number as a display numeral, headline beside it, date in steel.
 - **Review page buttons:** square, 2px ink border, ink fill on hover. Publish is filled orange.
 
@@ -107,5 +110,6 @@ Everything is square. No border radius anywhere, including buttons on the review
 - Do use the orange sparingly. If more than three orange elements are visible at once, something is wrong.
 - Don't add cards, shadows, gradients, icons, badges, or emoji.
 - Don't animate anything on load. The only motion is hover and focus states.
+- Don't tilt anything except GIFs. One sticker device, not a scrapbook.
 - Don't add a dark mode. The navy band is the dark moment.
 - Don't center text except inside the scoreboard scores.

@@ -23,7 +23,7 @@ export async function regenerateAction(formData: FormData): Promise<void> {
   if (!reviewKeyValid(key)) redirect("/");
   let status = "regenerated";
   try {
-    await generateIssue({ week, publish: false });
+    await generateIssue({ week, publish: false, overwritePublished: true });
   } catch (err) {
     status = `error: ${err instanceof Error ? err.message : String(err)}`;
   }

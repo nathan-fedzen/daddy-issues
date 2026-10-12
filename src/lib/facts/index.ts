@@ -86,6 +86,7 @@ export interface Facts {
     quietTeams: TeamRef[];
   };
   injuries: InjuryFact[];
+  chugList: (TeamRef & { player: string; position: string; slot: string })[];
   nextWeek: { week: number; home: TeamFacts; away: TeamFacts }[];
 }
 
@@ -245,6 +246,14 @@ export function buildFacts(snapshot: LeagueSnapshot, now = new Date()): Facts {
       quietTeams: tx.quietTeams.map(ref),
     },
     injuries,
+    chugList: lineups.flatMap((l) =>
+      l.zeroStarters.map((p) => ({
+        ...ref(l.teamId),
+        player: p.name,
+        position: p.position,
+        slot: p.slot,
+      })),
+    ),
     nextWeek,
   };
 }

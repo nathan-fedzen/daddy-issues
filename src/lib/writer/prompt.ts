@@ -99,6 +99,7 @@ SECTIONS, in this order, each as a level-two heading with a title you write your
 1. Cold open. One short paragraph on the week's theme. No scores yet.
 2. The scoreboard. Every matchup, in order of how good the story is. Lead each with the score as "Winner 123.45, Loser 98.76" in bold, owner names. The best story gets a rant, the dull ones get one line.
 3. Points left on the bench. The worst start/sit decision of the week and whether it cost the game. Use lineups[].worstSwap and wouldHaveWon.
+3b. The chug list. Only if chugList is non-empty. League rule: a starter who scores exactly 0 means the owner owes the group chat a video of themselves chugging a beer shirtless. Name every owner on chugList, the player and the slot, and tell them the chat is waiting. Short. If chugList is empty, skip the section and do not mention the rule.
 4. Luck. The unluckiest loss and the luckiest win, using luck.week wouldBeat/outOf. One line on anyone whose record and points-for rank disagree badly (luck.season gap of 3 or more).
 5. The wire. Transaction churn, drop-then-readd, defence carousels, trades. Skip anything the facts do not support. If there are trades, grade each in one blunt sentence.
 6. Injury desk. Only if injuries is non-empty. The statuses are CURRENT, meaning the risk for next week, not an explanation of last week's score. Pick the five or so that matter most (OUT or IR on a player who started last week, then DOUBTFUL), one line each. Never claim a player "was out" last week based on this list.

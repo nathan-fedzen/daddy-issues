@@ -12,6 +12,9 @@ export interface GenerateOptions {
   store?: IssueStore;
   gifs?: GifSearch | null;
   publish?: boolean;
+  // A published issue is live for the league; only an explicit editor action
+  // (review page, --force) may replace it.
+  overwritePublished?: boolean;
   now?: Date;
 }
 
@@ -21,7 +24,14 @@ export function autoPublish(): boolean {
 
 export async function generateIssue(options: GenerateOptions = {}): Promise<Issue> {
   const now = options.now ?? new Date();
+  const store = options.store ?? storeFromEnv();
   const snapshot = options.snapshot ?? (await fetchSnapshot(options.week));
+  const existing = await store.get(snapshot.season, snapshot.week);
+  if (existing?.status === "published" && !options.overwritePublished) {
+    throw new Error(
+      `Week ${snapshot.week} is already published. Pass --force (or regenerate from the review page) to replace it.`,
+    );
+  }
   const facts = buildFacts(snapshot, now);
   const writer = options.writer ?? writerFromEnv();
   const draft = await writer.write(facts);
@@ -40,7 +50,7 @@ export async function generateIssue(options: GenerateOptions = {}): Promise<Issu
     generatedAt: now.toISOString(),
     publishedAt: publish ? now.toISOString() : null,
   };
-  await (options.store ?? storeFromEnv()).put(issue);
+  await store.put(issue);
   return issue;
 }
 

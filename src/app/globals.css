@@ -26,6 +26,7 @@ body {
   margin: 0;
   min-height: 100dvh;
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 :focus-visible {
@@ -42,10 +43,22 @@ body {
   -webkit-text-stroke: 2px var(--color-white);
 }
 
+.headline {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(3rem, 12vw, 5.25rem);
+  line-height: 0.92;
+  letter-spacing: -0.015em;
+  max-width: 12ch;
+}
+
+/* Section heads sit on a heavy rule with an orange tab, the one structural
+   device the page uses; the issue body's h2 and the table/archive share it. */
+.section-head,
 .issue-body h2 {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 2rem;
+  font-size: clamp(1.9rem, 6vw, 2.4rem);
   line-height: 1;
   margin: 3rem 0 1rem;
   padding-top: 0.6rem;
@@ -53,14 +66,26 @@ body {
   position: relative;
 }
 
+.section-head::before,
 .issue-body h2::before {
   content: "";
   position: absolute;
   top: -2px;
   left: 0;
-  width: 2rem;
-  height: 6px;
+  width: 2.25rem;
+  height: 7px;
   background: var(--color-orange);
+}
+
+/* The scoreboard ribbon enters on a diagonal and leaves flat. */
+.scoreboard {
+  clip-path: polygon(0 0, 100% 1.25rem, 100% 100%, 0 100%);
+}
+
+@media (min-width: 640px) {
+  .scoreboard {
+    clip-path: polygon(0 0, 100% 2rem, 100% 100%, 0 100%);
+  }
 }
 
 .issue-body p {
@@ -89,6 +114,24 @@ body {
   text-underline-offset: 3px;
 }
 
+/* GIFs read as prints stuck onto the page: hard orange offset, slight tilt,
+   alternating direction so a run of them doesn't line up. */
+.issue-body img {
+  display: block;
+  width: min(100%, 22rem);
+  height: auto;
+  margin: 0.25rem 0 2rem 0.25rem;
+  border: 3px solid var(--color-ink);
+  box-shadow: 8px 8px 0 var(--color-orange);
+  transform: rotate(-1.5deg);
+}
+
+.issue-body p:nth-of-type(even) > img {
+  transform: rotate(1.2deg);
+  margin-left: auto;
+  margin-right: 0.5rem;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   a,
   button {
@@ -96,13 +139,4 @@ body {
       color 120ms ease-out,
       background-color 120ms ease-out;
   }
-}
-
-.issue-body img {
-  display: block;
-  max-width: 24rem;
-  width: 100%;
-  height: auto;
-  margin: 0 0 1.5rem;
-  border: 2px solid var(--color-ink);
 }
