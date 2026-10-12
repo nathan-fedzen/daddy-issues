@@ -87,36 +87,43 @@ export class FileIssueStore implements IssueStore {
   }
 }
 
+// Stores are private by default so drafts never sit on a guessable public
+// URL; set BLOB_ACCESS=public only if the store was created that way.
+function blobAccess(): "private" | "public" {
+  return process.env.BLOB_ACCESS === "public" ? "public" : "private";
+}
+
 export class BlobIssueStore implements IssueStore {
-  async get(season: number, week: number): Promise<Issue | null> {
-    const { head } = await import("@vercel/blob");
+  private async read(pathname: string): Promise<Issue | null> {
+    const { get } = await import("@vercel/blob");
     try {
-      const meta = await head(issueKey(season, week));
-      const res = await fetch(meta.url, { cache: "no-store" });
-      if (!res.ok) return null;
-      return (await res.json()) as Issue;
+      const result = await get(pathname, { access: blobAccess(), useCache: false });
+      if (!result || !result.stream) return null;
+      return JSON.parse(await new Response(result.stream).text()) as Issue;
     } catch (err) {
       if (isBlobNotFound(err)) return null;
       throw err;
     }
   }
 
+  async get(season: number, week: number): Promise<Issue | null> {
+    return this.read(issueKey(season, week));
+  }
+
   async list(season: number): Promise<IssueSummary[]> {
     const { list } = await import("@vercel/blob");
     const { blobs } = await list({ prefix: `issues/${season}/` });
-    const issues = await Promise.all(
-      blobs.map(async (b) => {
-        const res = await fetch(b.url, { cache: "no-store" });
-        return (await res.json()) as Issue;
-      }),
-    );
-    return issues.map(summarize).sort((a, b) => b.week - a.week);
+    const issues = await Promise.all(blobs.map((b) => this.read(b.pathname)));
+    return issues
+      .filter((i): i is Issue => i !== null)
+      .map(summarize)
+      .sort((a, b) => b.week - a.week);
   }
 
   async put(issue: Issue): Promise<void> {
     const { put } = await import("@vercel/blob");
     await put(issueKey(issue.season, issue.week), JSON.stringify(issue), {
-      access: "public",
+      access: blobAccess(),
       addRandomSuffix: false,
       allowOverwrite: true,
       contentType: "application/json",
