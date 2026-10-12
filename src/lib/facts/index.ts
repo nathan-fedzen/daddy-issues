@@ -92,6 +92,22 @@ export interface Facts {
 
 const TRANSACTION_WINDOW_DAYS = 7;
 
+// Issues stored before chugList existed still carry zeroStarters per lineup,
+// so the list can be rebuilt from them instead of regenerating the issue.
+export function chugListOf(facts: Facts): Facts["chugList"] {
+  if (facts.chugList) return facts.chugList;
+  return (facts.lineups ?? []).flatMap((l) =>
+    l.zeroStarters.map((p) => ({
+      teamId: l.teamId,
+      teamName: l.teamName,
+      owner: l.owner,
+      player: p.name,
+      position: p.position,
+      slot: p.slot,
+    })),
+  );
+}
+
 const dayLabel = new Intl.DateTimeFormat("en-US", {
   weekday: "short",
   month: "short",

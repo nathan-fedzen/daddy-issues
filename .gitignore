@@ -47,3 +47,4 @@ next-env.d.ts
 /data/*.html
 /data/*.json
 /data/*.md
+/data/*.bak

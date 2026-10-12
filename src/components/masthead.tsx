@@ -4,6 +4,7 @@ import { league } from "@/config/league";
 interface Props {
   week?: number;
   date?: string;
+  link?: { href: string; label: string };
 }
 
 // The wordmark is an SVG so it scales to the column width on every screen
@@ -31,7 +32,7 @@ function Wordmark({ name }: { name: string }) {
   );
 }
 
-export function Masthead({ week, date }: Props) {
+export function Masthead({ week, date, link }: Props) {
   return (
     <header>
       <div className="bg-ink text-paper">
@@ -50,7 +51,14 @@ export function Masthead({ week, date }: Props) {
           ) : (
             <span className="pt-3 text-sm font-medium text-steel">{league.newsletter.tagline}</span>
           )}
-          <span className="pb-0.5 text-sm font-medium text-steel">{date}</span>
+          <span className="flex items-baseline gap-4 pb-0.5 text-sm font-medium text-steel">
+            {date && <span>{date}</span>}
+            {link && (
+              <Link href={link.href} className="font-semibold text-orange underline underline-offset-4">
+                {link.label}
+              </Link>
+            )}
+          </span>
         </p>
       </div>
     </header>

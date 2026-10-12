@@ -5,11 +5,16 @@ import { Scoreboard } from "./scoreboard";
 import { IssueBody } from "./issue-body";
 import { Standings } from "./standings";
 import { Archive } from "./archive";
+import { ChugCallout } from "./chug-callout";
 
 export function IssuePage({ issue, archive }: { issue: Issue; archive: IssueSummary[] }) {
   return (
     <>
-      <Masthead week={issue.week} date={formatDate(issue.publishedAt ?? issue.generatedAt)} />
+      <Masthead
+        week={issue.week}
+        date={formatDate(issue.publishedAt ?? issue.generatedAt)}
+        link={{ href: "/chugs", label: "Chug tape" }}
+      />
       <main className="mx-auto max-w-[42rem] px-5 pb-20">
         <h1 className="headline mt-8 mb-8 text-balance">
           {issue.headline}
@@ -18,6 +23,7 @@ export function IssuePage({ issue, archive }: { issue: Issue; archive: IssueSumm
         <article className="mt-6">
           <IssueBody markdown={issue.markdown} />
         </article>
+        <ChugCallout facts={issue.facts} />
         <Standings facts={issue.facts} />
         <Archive issues={archive} currentWeek={issue.week} />
         {issue.markdown.includes("giphy.com") && (
