@@ -36,4 +36,4 @@ Owners, lore, rivalries, running bits and heat level live in `src/config/league.
 
 ## Deploying
 
-Vercel, with `vercel.json` scheduling `GET /api/cron/generate` every Tuesday at 11:00 UTC. Set the same env vars as `.env.local` plus `BLOB_READ_WRITE_TOKEN` from a Vercel Blob store. Issues land as drafts unless `AUTO_PUBLISH=true`; the review link is `/review/<week>?key=<REVIEW_KEY>`.
+Live at https://www.daddyissues.lol (bare domain redirects to www). Vercel, with `vercel.json` scheduling `GET /api/cron/generate` every Tuesday at 11:00 UTC. Set the same env vars as `.env.local` plus `BLOB_READ_WRITE_TOKEN` from a Vercel Blob store. Issues land as drafts unless `AUTO_PUBLISH=true`; the review link is `/review/<week>?key=<REVIEW_KEY>`.

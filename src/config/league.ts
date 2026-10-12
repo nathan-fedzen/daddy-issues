@@ -29,7 +29,7 @@ export const league: LeagueConfig = {
       owner: "Rudy",
       lore: "He is the commissioner, have no mercy on him"
      },
-    "3": { owner: "William" },
+    "3": { owner: "Bill" },
     "4": { owner: "Culley" },
     "5": {
       owner: "Dan",
