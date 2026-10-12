@@ -48,3 +48,4 @@ next-env.d.ts
 /data/*.json
 /data/*.md
 /data/*.bak
+/data/*.png
