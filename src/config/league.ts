@@ -9,6 +9,13 @@ export interface LeagueConfig {
   newsletter: { name: string; tagline: string };
   heat: 1 | 2 | 3 | 4 | 5;
   commissionerTeamId?: string;
+  // Teams the site tracks between issues: the villain strip under the
+  // scoreboard and the robot-vs-human tally.
+  villainTeamId?: string;
+  robot?: { teamId: string; name: string };
+  // Display names for the weekly awards; what each one is for is in
+  // src/lib/awards.ts.
+  trophies?: Record<"belt" | "dumpster" | "couch" | "lucky" | "robbed" | "hammer" | "churn" | "chug", string>;
   teams: Record<string, TeamBible>;
   rivalries: string[];
   runningBits: string[];
@@ -24,6 +31,18 @@ export const league: LeagueConfig = {
     tagline: "The weekly roast of Mile High Daddy and Subs Fantasy",
   },
   heat: 4,
+  villainTeamId: "7",
+  robot: { teamId: "5", name: "Muse AI" },
+  trophies: {
+    belt: "The Belt",
+    dumpster: "The Dumpster",
+    couch: "The Couch",
+    lucky: "Lucky Bastard",
+    robbed: "Robbed",
+    hammer: "The Hammer",
+    churn: "Churn King",
+    chug: "The Chug",
+  },
   teams: {
     "1": { 
       owner: "Rudy",
@@ -63,7 +82,7 @@ export const league: LeagueConfig = {
     "Dan and the robot: is Muse AI running his team yet, and would it have done better?",
     "Commissioner favoritism: Rudy and Tanner. Any week Tanner benefits from anything, note it with suspicion.",
     "Rudy is the commissioner and gets no mercy for it.",
-    "League rule: start a player who scores exactly 0 and you owe the group chat a video of yourself chugging a beer shirtless. Every zero-point starter gets named, and the owner gets reminded what they owe.",
+    "League rule: start a player who scores exactly 0 and you owe the group chat a video of yourself chugging a beer shirtless. Negative points do not count, only a dead-even zero. Every zero-point starter gets named, and the owner gets reminded what they owe.",
   ],
   offLimits: [
     "Real-life jobs, money, health, family, or appearance. The Rudy and Tanner engagement is the one sanctioned exception, and only as a favoritism joke.",

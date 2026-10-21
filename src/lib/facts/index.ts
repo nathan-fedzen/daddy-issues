@@ -1,6 +1,7 @@
 import type { LeagueSnapshot, PlayerLine, Team } from "@/lib/model";
 import { league, ownerName } from "@/config/league";
-import { lineupFacts, type LineupFacts } from "./lineup";
+import { lineupFacts, pointsOf, projectedLineup, round, type LineupFacts, type Pick } from "./lineup";
+import { benchAllStars } from "./bench";
 import { matchupResults, superlatives, type MatchupResult, type SideResult } from "./matchups";
 import {
   luckiestWin,
@@ -42,6 +43,41 @@ export interface InjuryFact extends TeamRef {
   position: string;
   status: string;
   wasStarterLastWeek: boolean;
+}
+
+export interface GameFact {
+  week: number;
+  homeId: string;
+  awayId: string;
+  homePoints: number;
+  awayPoints: number;
+}
+
+export interface RobotPick {
+  slot: Pick["slot"];
+  name: string;
+  position: string;
+  projected: number;
+  points: number;
+  wasStarter: boolean;
+}
+
+// What strictly starting by ESPN projection would have scored, per team.
+export interface RobotFacts extends TeamRef {
+  actual: number;
+  robot: number;
+  diff: number;
+  opponentPoints: number;
+  actualWon: boolean;
+  robotWon: boolean;
+  starters: RobotPick[];
+}
+
+export interface BenchStarFact extends TeamRef {
+  slot: Pick["slot"];
+  name: string;
+  position: string;
+  points: number;
 }
 
 export interface Facts {
@@ -88,6 +124,19 @@ export interface Facts {
   injuries: InjuryFact[];
   chugList: (TeamRef & { player: string; position: string; slot: string })[];
   nextWeek: { week: number; home: TeamFacts; away: TeamFacts }[];
+  // Added after the first issues shipped; older stored issues lack them until
+  // backfilled (scripts/backfill-facts.ts).
+  games?: GameFact[];
+  robot?: RobotFacts[];
+  benchAllStars?: { starters: BenchStarFact[]; total: number };
+  // Reader mail sent in after the previous issue, attached by the pipeline.
+  letters?: LetterFact[];
+}
+
+export interface LetterFact {
+  name: string;
+  body: string;
+  aboutWeek: number;
 }
 
 const TRANSACTION_WINDOW_DAYS = 7;
@@ -106,6 +155,18 @@ export function chugListOf(facts: Facts): Facts["chugList"] {
       slot: p.slot,
     })),
   );
+}
+
+export function gamesOf(facts: Facts): GameFact[] {
+  return facts.games ?? [];
+}
+
+export function robotOf(facts: Facts): RobotFacts[] {
+  return facts.robot ?? [];
+}
+
+export function benchAllStarsOf(facts: Facts): Facts["benchAllStars"] | null {
+  return facts.benchAllStars ?? null;
 }
 
 const dayLabel = new Intl.DateTimeFormat("en-US", {
@@ -209,6 +270,37 @@ export function buildFacts(snapshot: LeagueSnapshot, now = new Date()): Facts {
         })),
     );
 
+  const robot: RobotFacts[] = snapshot.matchups
+    .flatMap((m) => [m.home, m.away])
+    .map((tw) => {
+      const picks = projectedLineup(tw.lineup, snapshot.slots);
+      const points = pointsOf(picks);
+      const opp = opponentPoints.get(tw.teamId) ?? 0;
+      return {
+        ...ref(tw.teamId),
+        actual: tw.points,
+        robot: points,
+        diff: round(points - tw.points),
+        opponentPoints: opp,
+        actualWon: tw.points > opp,
+        robotWon: points > opp,
+        starters: picks.map((p) => ({
+          slot: p.slot,
+          name: p.player.name,
+          position: p.player.position,
+          projected: round(p.player.projected),
+          points: round(p.player.points),
+          wasStarter: p.player.slot !== "BE",
+        })),
+      };
+    })
+    .sort((a, b) => b.diff - a.diff);
+
+  const bench = benchAllStars(
+    snapshot.matchups.flatMap((m) => [m.home, m.away]),
+    snapshot.slots,
+  );
+
   const nextWeek = snapshot.games
     .filter((g) => g.week === snapshot.week + 1)
     .map((g) => ({
@@ -271,5 +363,19 @@ export function buildFacts(snapshot: LeagueSnapshot, now = new Date()): Facts {
       })),
     ),
     nextWeek,
+    games: snapshot.games
+      .filter((g) => g.final)
+      .map(({ week, homeId, awayId, homePoints, awayPoints }) => ({ week, homeId, awayId, homePoints, awayPoints })),
+    robot,
+    benchAllStars: {
+      starters: bench.starters.map((s) => ({
+        ...ref(s.teamId),
+        slot: s.slot,
+        name: s.player.name,
+        position: s.player.position,
+        points: round(s.player.points),
+      })),
+      total: bench.total,
+    },
   };
 }

@@ -40,8 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Generated issues and scratch facts
+# Generated issues, reader letters, and scratch facts
 /data/issues/
+/data/letters/
 /data/facts-*.json
 /data/*.log
 /data/*.html

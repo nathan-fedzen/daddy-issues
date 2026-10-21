@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import type { LeagueSnapshot } from "@/lib/model";
 import type { Issue, IssueStore, IssueSummary } from "@/lib/issues/store";
+import type { LetterStore } from "@/lib/letters";
 import { StubWriter } from "@/lib/writer/writer";
 import { generateIssue, publishIssue } from "./pipeline";
 
@@ -38,6 +39,20 @@ describe("generateIssue", () => {
     expect(issue.facts.chugList.map((c) => c.player)).toEqual(["Ladd McConkey", "Jets D/ST", "Rashee Rice"]);
     expect(issue.markdown).not.toContain("{{");
     expect(await store.get(2026, 4)).toEqual(issue);
+  });
+
+  it("attaches the previous week's letters to the facts", async () => {
+    const store = new MemoryStore();
+    const letters: LetterStore = {
+      async list(_season, week) {
+        return week === 3 ? [{ season: 2026, week: 3, name: "DJ", body: "unfair", postedAt: "2026-10-01T00:00:00Z" }] : [];
+      },
+      async add() {},
+    };
+    const issue = await generateIssue({ snapshot, store, writer: new StubWriter(), gifs: null, letters });
+    expect(issue.facts.letters).toEqual([{ name: "DJ", body: "unfair", aboutWeek: 3 }]);
+    const silent = await generateIssue({ snapshot, store, writer: new StubWriter(), gifs: null, letters: null });
+    expect(silent.facts.letters).toBeUndefined();
   });
 
   it("refuses to overwrite a published issue unless told to", async () => {

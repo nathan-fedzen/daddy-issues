@@ -102,6 +102,7 @@ Everything is square. No border radius anywhere, including buttons on the review
 - **Section head:** level-two headings from the issue markdown, Big Shoulders 700 at 2rem, on a 2px rule with a 2rem orange tab.
 - **Standings table:** rank, team, record, points, streak, playoff odds; points and streak fold into the team cell on phones. Odds carry a 20% orange bar behind the number sized to the percentage.
 - **Archive list:** week number as a display numeral, headline beside it, date in steel.
+- **Villain strip:** full-width ribbon in orange (loss) or ink (win) with uppercase display text crawling left (loss) or right (win); a double-ruled rubber stamp at minus 4 degrees; the loss counter in display numerals.
 - **Review page buttons:** square, 2px ink border, ink fill on hover. Publish is filled orange.
 
 ## Do's and Don'ts
@@ -109,7 +110,7 @@ Everything is square. No border radius anywhere, including buttons on the review
 - Do let the writing be the page. If a layout idea competes with the prose, drop it.
 - Do use the orange sparingly. If more than three orange elements are visible at once, something is wrong.
 - Don't add cards, shadows, gradients, icons, badges, or emoji.
-- Don't animate anything on load. The only motion is hover and focus states.
-- Don't tilt anything except GIFs. One sticker device, not a scrapbook.
+- Don't animate anything on load, with one exception: the villain strip under the scoreboard (crawling ribbon, a stamp that comes down once, a counter that ticks). Everything else moves only on hover and focus.
+- Don't tilt anything except GIFs and the villain stamp. Two print devices, not a scrapbook.
 - Don't add a dark mode. The navy band is the dark moment.
 - Don't center text except inside the scoreboard scores.

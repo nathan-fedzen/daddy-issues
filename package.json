@@ -12,7 +12,9 @@
     "generate": "tsx --env-file-if-exists=.env.local scripts/generate.ts",
     "seed:week4": "tsx scripts/seed-week4.ts",
     "export:html": "node scripts/export-html.mjs",
-    "push": "tsx --env-file-if-exists=.env.local scripts/push-issue.ts"
+    "push": "tsx --env-file-if-exists=.env.local scripts/push-issue.ts",
+    "pull": "tsx --env-file-if-exists=.env.local scripts/pull-issue.ts",
+    "backfill": "tsx --env-file-if-exists=.env.local scripts/backfill-facts.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",

@@ -1,8 +1,19 @@
+import type { Metadata } from "next";
+import { league } from "@/config/league";
 import { Masthead } from "@/components/masthead";
 import { IssuePage } from "@/components/issue-page";
 import { latestPublished, publishedIssues } from "@/lib/issues/queries";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const issue = await latestPublished();
+  if (!issue) return {};
+  return {
+    title: `${issue.headline} | ${league.newsletter.name}`,
+    description: `Week ${issue.week}. ${league.newsletter.tagline}.`,
+  };
+}
 
 export default async function Home() {
   const [issue, archive] = await Promise.all([latestPublished(), publishedIssues()]);

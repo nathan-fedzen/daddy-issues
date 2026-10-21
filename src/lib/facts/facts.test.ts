@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { Game, PlayerLine, Team, Transaction } from "@/lib/model";
-import { lineupFacts, optimalPoints, worstSwap } from "./lineup";
+import { lineupFacts, optimalPoints, pointsOf, projectedLineup, worstSwap } from "./lineup";
+import { benchAllStars } from "./bench";
 import { matchupResults, superlatives } from "./matchups";
 import { luckiestWin, seasonLuck, streaks, unluckiestLoss, weekLuck } from "./luck";
 import { transactionFacts } from "./transactions";
 import { simulatePlayoffs } from "./playoffs";
+import { rewindSnapshot } from "./rewind";
 
 const SLOTS = { QB: 1, RB: 2, WR: 2, TE: 1, FLEX: 1, K: 1, "D/ST": 1 } as const;
 
@@ -69,9 +71,63 @@ describe("lineupFacts", () => {
     expect(facts.benchTotal).toBe(65);
   });
 
+  it("only counts starters at exactly zero, not negatives", () => {
+    const lineup = [p("qb", "QB", "QB", 20), p("wr", "WR", "WR", 0), p("dst", "D/ST", "D/ST", -2)];
+    const facts = lineupFacts({ teamId: "1", points: 18, lineup }, SLOTS);
+    expect(facts.zeroStarters.map((z) => z.name)).toEqual(["wr"]);
+  });
+
   it("counts empty starting slots", () => {
     const facts = lineupFacts({ teamId: "1", points: 20, lineup: [p("qb", "QB", "QB", 20)] }, SLOTS);
     expect(facts.emptySlots).toBe(8);
+  });
+});
+
+describe("projectedLineup", () => {
+  const proj = (name: string, position: PlayerLine["position"], slot: PlayerLine["slot"], projected: number, points: number) => ({
+    ...p(name, position, slot, points),
+    projected,
+  });
+  const lineup = [
+    proj("qbStart", "QB", "QB", 18, 5),
+    proj("qbBench", "QB", "BE", 20, 30),
+    proj("rb1", "RB", "RB", 15, 15),
+    proj("rb2", "RB", "RB", 12, 3),
+    proj("rbBench", "RB", "BE", 9, 25),
+    proj("wr1", "WR", "WR", 14, 12),
+    proj("wr2", "WR", "WR", 11, 0),
+    proj("wrBench", "WR", "BE", 13, 10),
+    proj("te", "TE", "TE", 8, 4),
+    proj("k", "K", "K", 8, 8),
+    proj("dst", "D/ST", "D/ST", 7, 5),
+    proj("irGuy", "RB", "IR", 40, 40),
+  ];
+
+  it("starts by projection and scores what those players actually did", () => {
+    const picks = projectedLineup(lineup, SLOTS);
+    const names = Object.fromEntries(picks.map((x) => [x.slot === "FLEX" ? "FLEX" : x.player.name, x.player.name]));
+    expect(names.qbBench).toBe("qbBench");
+    expect(picks.find((x) => x.slot === "FLEX")?.player.name).toBe("wr2");
+    expect(picks.map((x) => x.player.name)).not.toContain("irGuy");
+    // QB 30, RB 15+3, WR 12+10, TE 4, FLEX wr2 0, K 8, DST 5
+    expect(pointsOf(picks)).toBe(87);
+  });
+});
+
+describe("benchAllStars", () => {
+  it("builds the best lineup from every team's bench", () => {
+    const teams = [
+      { teamId: "1", points: 0, lineup: [p("a-qb", "QB", "BE", 20), p("a-rb", "RB", "BE", 10), p("a-wr", "WR", "WR", 50)] },
+      { teamId: "2", points: 0, lineup: [p("b-qb", "QB", "BE", 25), p("b-rb", "RB", "BE", 12), p("b-te", "TE", "BE", 9)] },
+    ];
+    const stars = benchAllStars(teams, { QB: 1, RB: 2, TE: 1, FLEX: 1 });
+    expect(stars.starters.map((s) => [s.slot, s.player.name, s.teamId])).toEqual([
+      ["QB", "b-qb", "2"],
+      ["RB", "b-rb", "2"],
+      ["RB", "a-rb", "1"],
+      ["TE", "b-te", "2"],
+    ]);
+    expect(stars.total).toBe(56);
   });
 });
 
@@ -184,5 +240,33 @@ describe("simulatePlayoffs", () => {
     expect(a.odds[0].odds).toBeGreaterThan(90);
     expect(a.odds.reduce((s, o) => s + o.odds, 0)).toBeCloseTo(200, 0);
     expect(a.weeksRemaining).toBe(1);
+  });
+});
+
+describe("rewindSnapshot", () => {
+  it("recomputes records from games up to the week and unfinishes the rest", () => {
+    const teams: Team[] = ["1", "2"].map((id) => ({
+      id, name: id, abbrev: id, wins: 5, losses: 1, ties: 0, pointsFor: 999, pointsAgainst: 999,
+    }));
+    const games: Game[] = [
+      { week: 1, homeId: "1", awayId: "2", homePoints: 100, awayPoints: 90, final: true },
+      { week: 2, homeId: "2", awayId: "1", homePoints: 80, awayPoints: 70, final: true },
+      { week: 3, homeId: "1", awayId: "2", homePoints: 120, awayPoints: 60, final: true },
+    ];
+    const transactions: Transaction[] = [
+      { id: "a", type: "ADD", teamId: "1", date: "2026-09-15T00:00:00Z", items: [] },
+      { id: "b", type: "ADD", teamId: "1", date: "2026-09-30T00:00:00Z", items: [] },
+    ];
+    const snapshot = {
+      season: 2026, week: 3, leagueName: "L", playoffTeams: 1, regularSeasonWeeks: 3, slots: SLOTS,
+      teams, matchups: [], games, transactions, fetchedAt: "",
+    };
+    const back = rewindSnapshot(snapshot, 2, new Date("2026-09-22T12:00:00Z"));
+    expect(back.week).toBe(2);
+    expect(back.teams.find((t) => t.id === "1")).toMatchObject({ wins: 1, losses: 1, pointsFor: 170, pointsAgainst: 170 });
+    expect(back.games[2]).toMatchObject({ final: false, homePoints: 0, awayPoints: 0 });
+    expect(back.games[1]).toEqual(games[1]);
+    expect(back.transactions.map((t) => t.id)).toEqual(["a"]);
+    expect(snapshot.teams[0].wins).toBe(5);
   });
 });

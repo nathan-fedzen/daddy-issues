@@ -2,7 +2,9 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import type { Facts } from "@/lib/facts";
 
-export type IssueStatus = "draft" | "published";
+// "facts" is a week with no newsletter: backfilled facts only, so the season
+// page covers weeks before the first issue. It never lists as a back issue.
+export type IssueStatus = "draft" | "published" | "facts";
 
 export interface Issue {
   season: number;

@@ -140,3 +140,157 @@ body {
       background-color 120ms ease-out;
   }
 }
+
+/* The villain strip is the one thing on the page that moves on load: a
+   stadium ribbon crawls, a stamp comes down once, the counter ticks. Two
+   states, two palettes, so a loss and a win read differently at a glance. */
+@property --n {
+  syntax: "<integer>";
+  initial-value: 0;
+  inherits: false;
+}
+
+.villain {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.villain-ticker {
+  overflow: hidden;
+  border-top: 2px solid var(--color-ink);
+}
+
+.villain-lost .villain-ticker {
+  background: var(--color-orange);
+  color: var(--color-paper);
+}
+
+.villain-won .villain-ticker {
+  background: var(--color-ink);
+  color: var(--color-steel);
+}
+
+.villain-ticker-track {
+  display: flex;
+  width: max-content;
+  padding: 0.3rem 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.villain-ticker-track > span {
+  padding-right: 1em;
+}
+
+@keyframes villain-crawl {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.villain-lost .villain-ticker-track {
+  animation: villain-crawl 16s linear infinite;
+}
+
+.villain-won .villain-ticker-track {
+  animation: villain-crawl 32s linear infinite reverse;
+}
+
+.villain-headline {
+  font-size: clamp(2.6rem, 9vw, 3.6rem);
+}
+
+.villain-lost .villain-headline {
+  color: var(--color-orange);
+}
+
+.villain-stamp {
+  margin: 0;
+  padding: 0.3rem 0.5rem 0.2rem;
+  border: 3px double currentColor;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1.1rem, 4vw, 1.5rem);
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transform: rotate(-4deg);
+  animation: villain-stamp 280ms var(--ease-out) 450ms both;
+}
+
+.villain-lost .villain-stamp {
+  color: var(--color-orange);
+}
+
+@keyframes villain-stamp {
+  from {
+    opacity: 0;
+    transform: rotate(-4deg) scale(1.6);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-4deg) scale(1);
+  }
+}
+
+.villain-count::after {
+  counter-reset: n var(--n);
+  content: counter(n);
+}
+
+@keyframes villain-count {
+  from {
+    --n: 0;
+  }
+}
+
+.villain-won .villain-count {
+  animation: villain-count 1.2s var(--ease-out) 650ms both;
+}
+
+.villain-broken {
+  position: relative;
+}
+
+.villain-broken::after {
+  content: "";
+  position: absolute;
+  left: -0.1em;
+  right: -0.1em;
+  top: 50%;
+  height: 3px;
+  background: var(--color-orange);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: villain-strike 240ms var(--ease-out) 850ms both;
+}
+
+@keyframes villain-strike {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .villain-ticker-track,
+  .villain-count {
+    animation: none;
+  }
+  .villain-stamp {
+    animation: villain-fade 200ms ease-out 300ms both;
+  }
+  .villain-broken::after {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes villain-fade {
+  from {
+    opacity: 0;
+  }
+}

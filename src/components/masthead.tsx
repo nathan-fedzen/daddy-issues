@@ -1,10 +1,15 @@
 import Link from "next/link";
 import { league } from "@/config/league";
 
+interface NavLink {
+  href: string;
+  label: string;
+}
+
 interface Props {
   week?: number;
   date?: string;
-  link?: { href: string; label: string };
+  links?: NavLink[];
 }
 
 // The wordmark is an SVG so it scales to the column width on every screen
@@ -32,7 +37,7 @@ function Wordmark({ name }: { name: string }) {
   );
 }
 
-export function Masthead({ week, date, link }: Props) {
+export function Masthead({ week, date, links = [] }: Props) {
   return (
     <header>
       <div className="bg-ink text-paper">
@@ -52,12 +57,12 @@ export function Masthead({ week, date, link }: Props) {
             <span className="pt-3 text-sm font-medium text-steel">{league.newsletter.tagline}</span>
           )}
           <span className="flex items-baseline gap-4 pb-0.5 text-sm font-medium text-steel">
-            {date && <span>{date}</span>}
-            {link && (
-              <Link href={link.href} className="font-semibold text-orange underline underline-offset-4">
-                {link.label}
+            {date && <span className="hidden sm:inline">{date}</span>}
+            {links.map((l) => (
+              <Link key={l.href} href={l.href} className="font-semibold text-orange underline underline-offset-4">
+                {l.label}
               </Link>
-            )}
+            ))}
           </span>
         </p>
       </div>

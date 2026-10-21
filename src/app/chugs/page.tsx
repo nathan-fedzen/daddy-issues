@@ -1,8 +1,7 @@
 import { league } from "@/config/league";
 import { Masthead } from "@/components/masthead";
 import { buildLedger, listChugs, owedFromIssues, teamChoices, type ChugVideo } from "@/lib/chugs";
-import { publishedIssues } from "@/lib/issues/queries";
-import { storeFromEnv, type Issue } from "@/lib/issues/store";
+import { publishedIssues, publishedIssuesWithFacts } from "@/lib/issues/queries";
 import { UploadForm } from "./upload-form";
 
 export const dynamic = "force-dynamic";
@@ -12,12 +11,7 @@ function when(ms: number): string {
 }
 
 export default async function ChugsPage() {
-  const store = storeFromEnv();
-  const summaries = await publishedIssues();
-  const issues = (await Promise.all(summaries.map((s) => store.get(s.season, s.week)))).filter(
-    (i): i is Issue => i !== null,
-  );
-  const videos = await listChugs();
+  const [summaries, issues, videos] = await Promise.all([publishedIssues(), publishedIssuesWithFacts(), listChugs()]);
   const ledger = buildLedger(owedFromIssues(issues), videos);
   const outstanding = ledger.filter((l) => !l.video);
   const byWeek = new Map<number, ChugVideo[]>();
@@ -27,7 +21,7 @@ export default async function ChugsPage() {
 
   return (
     <>
-      <Masthead link={{ href: "/", label: "Latest issue" }} />
+      <Masthead links={[{ href: "/", label: "Latest issue" }, { href: "/season", label: "Season" }]} />
       <main className="mx-auto max-w-[42rem] px-5 pb-20">
         <h1 className="headline mt-8 mb-4">The chug tape</h1>
         <p className="max-w-[36rem]">

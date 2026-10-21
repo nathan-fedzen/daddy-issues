@@ -8,6 +8,11 @@ export interface Swap {
   gain: number;
 }
 
+export interface Pick {
+  slot: Slot;
+  player: PlayerLine;
+}
+
 export interface LineupFacts {
   teamId: string;
   actual: number;
@@ -25,11 +30,17 @@ export function slotEligible(slot: Slot, position: Position): boolean {
 }
 
 // Fixed per-position slots plus one FLEX makes greedy optimal: fill each
-// position with its top scorers, then give FLEX the best leftover RB/WR/TE.
-export function optimalPoints(players: PlayerLine[], slots: SlotCounts): number {
-  const pool = players.filter((p) => p.slot !== "IR").sort((a, b) => b.points - a.points);
+// position with its top players by `value`, then give FLEX the best leftover
+// RB/WR/TE. The same picker builds the hindsight lineup (value = points) and
+// the robot lineup (value = projection).
+export function pickLineup(
+  players: PlayerLine[],
+  slots: SlotCounts,
+  value: (p: PlayerLine) => number,
+): Pick[] {
+  const pool = players.filter((p) => p.slot !== "IR").sort((a, b) => value(b) - value(a));
   const used = new Set<string>();
-  let total = 0;
+  const picks: Pick[] = [];
   for (const [slot, count] of Object.entries(slots) as [Slot, number][]) {
     if (slot === "FLEX") continue;
     let taken = 0;
@@ -37,7 +48,7 @@ export function optimalPoints(players: PlayerLine[], slots: SlotCounts): number 
       if (taken >= count) break;
       if (used.has(p.playerId) || p.position !== slot) continue;
       used.add(p.playerId);
-      total += p.points;
+      picks.push({ slot, player: p });
       taken++;
     }
   }
@@ -46,10 +57,23 @@ export function optimalPoints(players: PlayerLine[], slots: SlotCounts): number 
     if (flexTaken >= (slots.FLEX ?? 0)) break;
     if (used.has(p.playerId) || !FLEX_ELIGIBLE.includes(p.position)) continue;
     used.add(p.playerId);
-    total += p.points;
+    picks.push({ slot: "FLEX", player: p });
     flexTaken++;
   }
-  return round(total);
+  return picks;
+}
+
+export function pointsOf(picks: Pick[]): number {
+  return round(picks.reduce((s, p) => s + p.player.points, 0));
+}
+
+export function optimalPoints(players: PlayerLine[], slots: SlotCounts): number {
+  return pointsOf(pickLineup(players, slots, (p) => p.points));
+}
+
+// What a manager who starts strictly by ESPN projection would have fielded.
+export function projectedLineup(players: PlayerLine[], slots: SlotCounts): Pick[] {
+  return pickLineup(players, slots, (p) => p.projected);
 }
 
 export function worstSwap(players: PlayerLine[]): Swap | null {
@@ -77,7 +101,7 @@ export function lineupFacts(team: TeamWeek, slots: SlotCounts): LineupFacts {
     optimal,
     pointsLeft: round(Math.max(0, optimal - team.points)),
     worstSwap: worstSwap(team.lineup),
-    zeroStarters: starters.filter((p) => p.points <= 0),
+    zeroStarters: starters.filter((p) => p.points === 0),
     emptySlots: Math.max(0, starterSlots - starters.length),
     benchTotal: round(bench.reduce((s, p) => s + p.points, 0)),
   };
