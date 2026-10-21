@@ -4,7 +4,14 @@ const rec = (r: WinLoss) => `${r.wins}-${r.losses}`;
 
 export function ScheduleSwap({ rows, throughWeek }: { rows: ScheduleSwapRow[]; throughWeek: number }) {
   if (rows.length === 0) return null;
-  const sorted = [...rows].sort((a, b) => b.unluckier - a.unluckier || a.luckier - b.luckier);
+  const others = rows.length - 1;
+  const sorted = [...rows].sort((a, b) => b.betterSchedules - a.betterSchedules || a.worseSchedules - b.worseSchedules);
+  const caption = (r: ScheduleSwapRow) => {
+    if (r.betterSchedules === 0 && r.worseSchedules === 0) return "Every schedule comes out the same.";
+    if (r.betterSchedules === 0) return "Softest schedule in the league. Say thank you.";
+    if (r.worseSchedules === 0) return `Hardest schedule in the league. All ${others} others would have been better.`;
+    return `${r.betterSchedules} of ${others} schedules would have been better, ${r.worseSchedules} worse.`;
+  };
   const order = rows;
   return (
     <section aria-label="Schedule swap" id="schedule" className="mt-14">
@@ -18,13 +25,7 @@ export function ScheduleSwap({ rows, throughWeek }: { rows: ScheduleSwapRow[]; t
           <li key={r.teamId} className="flex items-baseline justify-between gap-4 py-2">
             <span className="min-w-0">
               <span className="font-semibold">{r.owner}</span>
-              <span className="block text-xs text-steel">
-                {r.unluckier === 0
-                  ? "Nobody's schedule would have helped."
-                  : r.luckier === 0
-                    ? "Any other schedule would have been worse. Say thank you."
-                    : `${r.unluckier} of ${rows.length - 1} schedules would have been better.`}
-              </span>
+              <span className="block text-xs text-steel">{caption(r)}</span>
             </span>
             <span className="shrink-0 text-right font-display text-xl font-black leading-none nums">
               {rec(r.actual)}

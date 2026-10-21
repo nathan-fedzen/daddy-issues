@@ -58,8 +58,8 @@ describe("scheduleSwap", () => {
     expect(a.withSchedule.D).toEqual({ wins: 1, losses: 2 });
     expect(a.best).toEqual({ wins: 3, losses: 0 });
     expect(a.worst).toEqual({ wins: 1, losses: 2 });
-    expect(a.unluckier).toBe(1);
-    expect(a.luckier).toBe(1);
+    expect(a.betterSchedules).toBe(1);
+    expect(a.worseSchedules).toBe(1);
   });
 });
 

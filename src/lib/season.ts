@@ -200,10 +200,10 @@ export interface ScheduleSwapRow extends TeamRef {
   withSchedule: Record<string, WinLoss>;
   best: WinLoss;
   worst: WinLoss;
-  // How many of the other schedules would leave this team better or worse
-  // off than the one it actually got.
-  luckier: number;
-  unluckier: number;
+  // How many of the other schedules would have given this team a better
+  // record than it has, and how many a worse one.
+  betterSchedules: number;
+  worseSchedules: number;
 }
 
 export function scheduleSwap(games: GameFact[], teams: TeamRef[]): ScheduleSwapRow[] {
@@ -237,18 +237,18 @@ export function scheduleSwap(games: GameFact[], teams: TeamRef[]): ScheduleSwapR
     const withSchedule: Record<string, WinLoss> = {};
     let best = actual;
     let worst = actual;
-    let luckier = 0;
-    let unluckier = 0;
+    let betterSchedules = 0;
+    let worseSchedules = 0;
     for (const o of teams) {
       const rec = recordWith(t.teamId, o.teamId);
       withSchedule[o.teamId] = rec;
       if (o.teamId === t.teamId) continue;
       if (better(rec, best)) best = rec;
       if (better(worst, rec)) worst = rec;
-      if (better(actual, rec)) luckier++;
-      if (better(rec, actual)) unluckier++;
+      if (better(rec, actual)) betterSchedules++;
+      if (better(actual, rec)) worseSchedules++;
     }
-    return { ...refOf(t), actual, withSchedule, best, worst, luckier, unluckier };
+    return { ...refOf(t), actual, withSchedule, best, worst, betterSchedules, worseSchedules };
   });
 }
 
