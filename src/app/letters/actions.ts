@@ -1,7 +1,8 @@
 "use server";
 
+import { updateTag } from "next/cache";
 import { league } from "@/config/league";
-import { alreadyWrote, letterStoreFromEnv, passcodeValid, validateLetter } from "@/lib/letters";
+import { alreadyWrote, LETTERS_TAG, letterStoreFromEnv, passcodeValid, validateLetter } from "@/lib/letters";
 
 export interface LetterState {
   status: "idle" | "sent" | "error";
@@ -27,5 +28,6 @@ export async function postLetter(_prev: LetterState, formData: FormData): Promis
     body: checked.body,
     postedAt: new Date().toISOString(),
   });
+  updateTag(LETTERS_TAG);
   return { status: "sent", message: "Received. The editor will respond next week, probably badly." };
 }

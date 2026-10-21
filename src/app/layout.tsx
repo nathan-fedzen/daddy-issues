@@ -5,6 +5,7 @@ import "./globals.css";
 import { league } from "@/config/league";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.SITE_URL ?? "https://www.daddyissues.lol"),
   title: league.newsletter.name,
   description: league.newsletter.tagline,
 };

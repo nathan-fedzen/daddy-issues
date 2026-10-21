@@ -89,6 +89,11 @@ export class FileIssueStore implements IssueStore {
   }
 }
 
+// Reads that hit the Blob CDN cache are free on every plan; uncached reads
+// count against a small monthly quota that locks the store for 30 days when
+// exceeded. Overwritten issues go stale for at most this long.
+export const BLOB_CACHE_SECONDS = 60;
+
 // Stores are private by default so drafts never sit on a guessable public
 // URL; set BLOB_ACCESS=public only if the store was created that way.
 function blobAccess(): "private" | "public" {
@@ -99,7 +104,7 @@ export class BlobIssueStore implements IssueStore {
   private async read(pathname: string): Promise<Issue | null> {
     const { get } = await import("@vercel/blob");
     try {
-      const result = await get(pathname, { access: blobAccess(), useCache: false });
+      const result = await get(pathname, { access: blobAccess() });
       if (!result || !result.stream) return null;
       return JSON.parse(await new Response(result.stream).text()) as Issue;
     } catch (err) {
@@ -129,6 +134,7 @@ export class BlobIssueStore implements IssueStore {
       addRandomSuffix: false,
       allowOverwrite: true,
       contentType: "application/json",
+      cacheControlMaxAge: BLOB_CACHE_SECONDS,
     });
   }
 }

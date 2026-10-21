@@ -1,4 +1,5 @@
-import { letterStoreFromEnv } from "@/lib/letters";
+import { unstable_cache } from "next/cache";
+import { LETTERS_TAG, letterStoreFromEnv, type Letter } from "@/lib/letters";
 import { LetterForm } from "./letter-form";
 
 const when = new Intl.DateTimeFormat("en-US", {
@@ -8,8 +9,15 @@ const when = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/Denver",
 });
 
+const listLetters: (season: number, week: number) => Promise<Letter[]> = process.env.BLOB_READ_WRITE_TOKEN
+  ? unstable_cache((season: number, week: number) => letterStoreFromEnv().list(season, week), ["letters-list"], {
+      tags: [LETTERS_TAG],
+      revalidate: 300,
+    })
+  : (season, week) => letterStoreFromEnv().list(season, week);
+
 export async function Letters({ season, week }: { season: number; week: number }) {
-  const letters = await letterStoreFromEnv().list(season, week);
+  const letters = await listLetters(season, week);
   return (
     <section aria-label="Letters to the editor" id="letters" className="mt-14">
       <h2 className="section-head">Letters to the editor</h2>

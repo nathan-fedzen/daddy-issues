@@ -1,4 +1,6 @@
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
+import { ISSUES_TAG } from "@/lib/issues/queries";
 import { generateIssue } from "@/lib/pipeline";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +14,7 @@ export async function GET(request: Request) {
   const week = new URL(request.url).searchParams.get("week");
   try {
     const issue = await generateIssue({ week: week ? Number(week) : undefined });
+    revalidateTag(ISSUES_TAG, "max");
     return NextResponse.json({
       week: issue.week,
       status: issue.status,

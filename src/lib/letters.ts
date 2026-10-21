@@ -110,6 +110,8 @@ function sortLetters(letters: Letter[]): Letter[] {
   return [...letters].sort((a, b) => a.postedAt.localeCompare(b.postedAt));
 }
 
+export const LETTERS_TAG = "letters";
+
 export function letterStoreFromEnv(): LetterStore {
   if (process.env.BLOB_READ_WRITE_TOKEN) return new BlobLetterStore();
   return new FileLetterStore();

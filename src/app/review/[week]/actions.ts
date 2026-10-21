@@ -1,7 +1,9 @@
 "use server";
 
+import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { league } from "@/config/league";
+import { ISSUES_TAG } from "@/lib/issues/queries";
 import { generateIssue, publishIssue } from "@/lib/pipeline";
 import { reviewKeyValid } from "@/lib/review-key";
 
@@ -14,6 +16,7 @@ export async function publishAction(formData: FormData): Promise<void> {
   const week = Number(formData.get("week"));
   if (!reviewKeyValid(key)) redirect("/");
   const issue = await publishIssue(league.season, week);
+  updateTag(ISSUES_TAG);
   back(week, key, issue ? "published" : "missing");
 }
 
@@ -24,6 +27,7 @@ export async function regenerateAction(formData: FormData): Promise<void> {
   let status = "regenerated";
   try {
     await generateIssue({ week, publish: false, overwritePublished: true });
+    updateTag(ISSUES_TAG);
   } catch (err) {
     status = `error: ${err instanceof Error ? err.message : String(err)}`;
   }
