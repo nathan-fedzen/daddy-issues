@@ -8,6 +8,8 @@ export interface BallotSide {
   owner: string;
   teamName: string;
   record: string;
+  projected: number;
+  stars: { name: string; position: string; projected: number }[];
 }
 
 export interface BallotGame {
@@ -30,6 +32,7 @@ interface Props {
 }
 
 function SideButton({ side, chosen, onPick }: { side: BallotSide; chosen: boolean; onPick: () => void }) {
+  const muted = chosen ? "text-paper/70" : "text-steel";
   return (
     <button
       type="button"
@@ -40,10 +43,24 @@ function SideButton({ side, chosen, onPick }: { side: BallotSide; chosen: boolea
       }`}
     >
       <span className="block truncate font-display text-2xl font-bold leading-none">{side.owner}</span>
-      <span className={`mt-1.5 block truncate text-xs font-medium ${chosen ? "text-paper/70" : "text-steel"}`}>
+      <span className={`mt-1.5 block truncate text-xs font-medium ${muted}`}>
         {side.teamName !== side.owner && `${side.teamName}, `}
         {side.record}
       </span>
+      <span className="mt-2.5 flex items-baseline gap-1.5">
+        <span className="font-display text-2xl font-black leading-none nums">{side.projected.toFixed(1)}</span>
+        <span className={`text-xs font-medium ${muted}`}>projected</span>
+      </span>
+      {side.stars.length > 0 && (
+        <span className={`mt-1.5 block text-xs leading-snug ${muted}`}>
+          {side.stars.map((s) => (
+            <span key={s.name} className="flex justify-between gap-2">
+              <span className="truncate">{s.name}</span>
+              <span className="nums">{s.projected.toFixed(1)}</span>
+            </span>
+          ))}
+        </span>
+      )}
     </button>
   );
 }

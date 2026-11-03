@@ -17,7 +17,7 @@ async function main() {
   const week = Number(flag("week"));
   if (!Number.isInteger(week) || week < 1) throw new Error("--week N is required");
   const count = Number(flag("voters") ?? 11);
-  const slate = await loadSlate();
+  const slate = await loadSlate(week);
   const games = slate.games.filter((g) => g.week === week);
   if (games.length === 0) throw new Error(`No games for week ${week}`);
 

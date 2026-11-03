@@ -22,7 +22,7 @@ export async function submitPicks(_prev: PickState, formData: FormData): Promise
   if (!window.open) return error(`Week ${week} picks locked ${lockLabel(window.lockAt)}.`);
   if (!passcodeValid(formData.get("passcode"))) return error("Wrong passcode.");
 
-  const slate = await fetchSlate();
+  const slate = await fetchSlate(week);
   const games = slate.games
     .filter((g) => g.week === week)
     .map((g) => ({ key: gameKey(g), homeId: g.homeId, awayId: g.awayId }));

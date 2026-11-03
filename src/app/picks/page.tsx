@@ -40,7 +40,7 @@ export default async function PicksPage({ searchParams }: PageProps<"/picks">) {
   const sp = await searchParams;
   const canPreview = reviewKeyValid(one(sp.key)) || process.env.NODE_ENV === "development";
   const { window, previewing } = windowFor(one(sp.preview), one(sp.week), canPreview);
-  const [slate, sheets] = await Promise.all([fetchSlate(), listPicks(league.season)]);
+  const [slate, sheets] = await Promise.all([fetchSlate(window.week), listPicks(league.season)]);
 
   const teamById = new Map(slate.teams.map((t) => [t.id, t]));
   const nameOf = (id: string) => ownerName(id, teamById.get(id)?.name ?? `Team ${id}`);
@@ -58,6 +58,8 @@ export default async function PicksPage({ searchParams }: PageProps<"/picks">) {
     owner: nameOf(id),
     teamName: teamById.get(id)?.name.trim() ?? "",
     record: recordOf(teamById.get(id)),
+    projected: slate.projections[id]?.total ?? 0,
+    stars: slate.projections[id]?.stars ?? [],
   });
   const ballotGames: BallotGame[] = games.map((g) => ({ key: gameKey(g), home: side(g.homeId), away: side(g.awayId) }));
   const votes = votesByGame(weekSheets, games);

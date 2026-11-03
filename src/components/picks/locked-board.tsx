@@ -3,6 +3,7 @@ export interface BoardSide {
   owner: string;
   teamName: string;
   record: string;
+  projected: number;
   points: number;
   voters: string[];
 }
@@ -32,6 +33,7 @@ function Side({ m, side, other, align }: { m: BoardMatchup; side: BoardSide; oth
       <p className={`mt-1 font-display font-black leading-none nums text-[clamp(2.25rem,9vw,3.25rem)] ${score}`}>
         {side.points.toFixed(2)}
       </p>
+      {side.projected > 0 && <p className="text-xs font-medium text-steel nums">{side.projected.toFixed(1)} projected</p>}
       <ul className="mt-2 text-sm leading-snug">
         {side.voters.length === 0 ? (
           <li className="text-steel">Nobody</li>
