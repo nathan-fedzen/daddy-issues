@@ -19,8 +19,8 @@ export function IssuePage({ issue, archive }: { issue: Issue; archive: IssueSumm
         week={issue.week}
         date={formatDate(issue.publishedAt ?? issue.generatedAt)}
         links={[
+          { href: "/picks", label: "Picks" },
           { href: "/season", label: "Season" },
-          { href: "/chugs", label: "Chug tape" },
         ]}
       />
       <main className="mx-auto max-w-[42rem] px-5 pb-20">

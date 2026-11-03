@@ -5,6 +5,10 @@ import { writerFromEnv, type Writer } from "@/lib/writer/writer";
 import { storeFromEnv, type Issue, type IssueStore } from "@/lib/issues/store";
 import { gifSearchFromEnv, resolveGifs, type GifSearch } from "@/lib/gifs";
 import { letterStoreFromEnv, type LetterStore } from "@/lib/letters";
+import { researcherFromEnv, type Researcher } from "@/lib/research/researcher";
+import { pickFacts } from "@/lib/picks/board";
+import { pickStoreFromEnv, type PickStore } from "@/lib/picks/store";
+import { ownerName } from "@/config/league";
 
 export interface GenerateOptions {
   week?: number;
@@ -14,6 +18,10 @@ export interface GenerateOptions {
   gifs?: GifSearch | null;
   // Reader letters from the previous week go into the facts; null skips them.
   letters?: LetterStore | null;
+  // Looks up what happened in the NFL games before the writer runs; null skips it.
+  research?: Researcher | null;
+  // The week's pick'em ballots, graded into the facts; null skips them.
+  picks?: PickStore | null;
   publish?: boolean;
   // A published issue is live for the league; only an explicit editor action
   // (review page, --force) may replace it.
@@ -44,6 +52,21 @@ export async function generateIssue(options: GenerateOptions = {}): Promise<Issu
       aboutWeek: l.week,
     }));
   }
+  const pickStore = options.picks === undefined ? pickStoreFromEnv() : options.picks;
+  if (pickStore) {
+    const sheets = await pickStore.list(snapshot.season);
+    const teamName = (id: string) => snapshot.teams.find((t) => t.id === id)?.name ?? `Team ${id}`;
+    const graded = pickFacts(
+      sheets,
+      snapshot.games,
+      snapshot.week,
+      (id) => ownerName(id, teamName(id)),
+      snapshot.teams.map((t) => t.id),
+    );
+    if (graded) facts.picks = graded;
+  }
+  const researcher = options.research === undefined ? researcherFromEnv() : options.research;
+  if (researcher) facts.research = await researcher.research(facts);
   const writer = options.writer ?? writerFromEnv();
   const draft = await writer.write(facts);
   const gifs = options.gifs === undefined ? gifSearchFromEnv() : options.gifs;

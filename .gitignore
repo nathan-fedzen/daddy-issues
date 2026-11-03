@@ -50,3 +50,5 @@ next-env.d.ts
 /data/*.md
 /data/*.bak
 /data/*.png
+data/picks
+.playwright-mcp

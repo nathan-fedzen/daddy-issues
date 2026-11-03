@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { chugListOf, type Facts } from "@/lib/facts";
 
 export function ChugCallout({ facts }: { facts: Facts }) {
@@ -20,9 +19,7 @@ export function ChugCallout({ facts }: { facts: Facts }) {
           </li>
         ))}
       </ul>
-      <Link href="/chugs" className="mt-3 inline-block font-semibold text-orange underline underline-offset-4">
-        Upload the video, or watch the others
-      </Link>
+      <p className="mt-3 text-sm text-steel">Shirtless, on video, in the group chat. The chat is waiting.</p>
     </aside>
   );
 }

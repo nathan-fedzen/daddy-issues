@@ -15,6 +15,7 @@ import {
 } from "./luck";
 import { transactionFacts, type TransactionFacts } from "./transactions";
 import { simulatePlayoffs, type PlayoffSim } from "./playoffs";
+import type { PickFacts } from "@/lib/picks/board";
 
 export interface TeamRef {
   teamId: string;
@@ -73,6 +74,33 @@ export interface RobotFacts extends TeamRef {
   starters: RobotPick[];
 }
 
+export interface BoxPlayerFact {
+  slot: string;
+  name: string;
+  position: string;
+  proTeam: string;
+  points: number;
+  projected: number;
+  played: boolean;
+  line: string;
+}
+
+// Every team's full lineup with real stat lines, so the writer can tell a
+// scratch from a guy who got hurt on the first snap.
+export interface TeamBoxFacts extends TeamRef {
+  points: number;
+  starters: BoxPlayerFact[];
+  bench: BoxPlayerFact[];
+}
+
+// What the research desk found out about a player's NFL game.
+export interface ResearchNote {
+  player: string;
+  owner: string;
+  what: string;
+  source?: string;
+}
+
 export interface BenchStarFact extends TeamRef {
   slot: Pick["slot"];
   name: string;
@@ -122,15 +150,21 @@ export interface Facts {
     quietTeams: TeamRef[];
   };
   injuries: InjuryFact[];
-  chugList: (TeamRef & { player: string; position: string; slot: string })[];
+  chugList: (TeamRef & { player: string; position: string; slot: string; played?: boolean; line?: string })[];
   nextWeek: { week: number; home: TeamFacts; away: TeamFacts }[];
   // Added after the first issues shipped; older stored issues lack them until
   // backfilled (scripts/backfill-facts.ts).
   games?: GameFact[];
   robot?: RobotFacts[];
   benchAllStars?: { starters: BenchStarFact[]; total: number };
+  // Present once the snapshot carries box lines (issues from week 9 on).
+  boxScores?: TeamBoxFacts[];
   // Reader mail sent in after the previous issue, attached by the pipeline.
   letters?: LetterFact[];
+  // Game context looked up by the research desk, attached by the pipeline.
+  research?: ResearchNote[];
+  // The league's pick'em for this week, graded, attached by the pipeline.
+  picks?: PickFacts;
 }
 
 export interface LetterFact {
@@ -301,6 +335,27 @@ export function buildFacts(snapshot: LeagueSnapshot, now = new Date()): Facts {
     snapshot.slots,
   );
 
+  const teamWeeks = snapshot.matchups.flatMap((m) => [m.home, m.away]);
+  const hasBox = teamWeeks.some((tw) => tw.lineup.some((p) => p.box));
+  const boxPlayer = (p: PlayerLine): BoxPlayerFact => ({
+    slot: p.slot,
+    name: p.name,
+    position: p.position,
+    proTeam: p.proTeam,
+    points: round(p.points),
+    projected: round(p.projected),
+    played: p.box?.played ?? false,
+    line: p.box?.line ?? "no stat line",
+  });
+  const boxScores: TeamBoxFacts[] | undefined = hasBox
+    ? teamWeeks.map((tw) => ({
+        ...ref(tw.teamId),
+        points: tw.points,
+        starters: tw.lineup.filter((p) => p.slot !== "BE" && p.slot !== "IR").map(boxPlayer),
+        bench: tw.lineup.filter((p) => p.slot === "BE").map(boxPlayer),
+      }))
+    : undefined;
+
   const nextWeek = snapshot.games
     .filter((g) => g.week === snapshot.week + 1)
     .map((g) => ({
@@ -360,6 +415,7 @@ export function buildFacts(snapshot: LeagueSnapshot, now = new Date()): Facts {
         player: p.name,
         position: p.position,
         slot: p.slot,
+        ...(p.box ? { played: p.box.played, line: p.box.line } : {}),
       })),
     ),
     nextWeek,
@@ -377,5 +433,6 @@ export function buildFacts(snapshot: LeagueSnapshot, now = new Date()): Facts {
       })),
       total: bench.total,
     },
+    ...(boxScores ? { boxScores } : {}),
   };
 }

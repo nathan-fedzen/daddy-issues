@@ -12,6 +12,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   const week = new URL(request.url).searchParams.get("week");
+  const started = Date.now();
   try {
     const issue = await generateIssue({ week: week ? Number(week) : undefined });
     revalidateTag(ISSUES_TAG, "max");
@@ -20,6 +21,8 @@ export async function GET(request: Request) {
       status: issue.status,
       headline: issue.headline,
       model: issue.model,
+      researchNotes: issue.facts.research?.length ?? 0,
+      seconds: Math.round((Date.now() - started) / 1000),
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

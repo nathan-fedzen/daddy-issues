@@ -7,6 +7,7 @@ export interface EspnStat {
   scoringPeriodId: number;
   statSourceId: number;
   appliedTotal?: number;
+  stats?: Record<string, number>;
 }
 
 export interface EspnPlayer {
@@ -27,6 +28,7 @@ export interface EspnRosterEntry {
 export interface EspnMatchupSide {
   teamId: number;
   totalPoints: number;
+  totalPointsLive?: number;
   rosterForCurrentScoringPeriod?: { entries: EspnRosterEntry[] };
 }
 

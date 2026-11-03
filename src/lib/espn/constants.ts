@@ -21,6 +21,33 @@ export const SLOT_BY_ID: Record<number, Slot> = {
   23: "FLEX",
 };
 
+// Ids inside a player's actual (statSourceId 0) stat map for the week.
+export const STAT = {
+  passAtt: 0,
+  passComp: 1,
+  passYds: 3,
+  passTd: 4,
+  passInt: 20,
+  rushAtt: 23,
+  rushYds: 24,
+  rushTd: 25,
+  recYds: 42,
+  recTd: 43,
+  rec: 53,
+  targets: 58,
+  fumblesLost: 72,
+  fgMade: 83,
+  fgAtt: 84,
+  xpMade: 86,
+  xpAtt: 87,
+  defInt: 95,
+  defFumRec: 96,
+  sacks: 99,
+  pointsAllowed: 120,
+  yardsAllowed: 127,
+  gamesPlayed: 210,
+} as const;
+
 export const PRO_TEAM_BY_ID: Record<number, string> = {
   0: "FA",
   1: "ATL",

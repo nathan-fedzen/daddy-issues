@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Masthead } from "@/components/masthead";
 import { Scoreboard } from "@/components/scoreboard";
 import { IssueBody } from "@/components/issue-body";
+import { ResearchNotes } from "@/components/research-notes";
 import { Standings } from "@/components/standings";
 import { anyIssue, formatDate } from "@/lib/issues/queries";
 import { reviewKeyValid } from "@/lib/review-key";
@@ -62,6 +63,7 @@ export default async function ReviewPage({ params, searchParams }: PageProps<"/r
               <IssueBody markdown={issue.markdown} />
             </article>
             <Standings facts={issue.facts} />
+            {issue.facts.research && <ResearchNotes notes={issue.facts.research} />}
           </>
         )}
       </main>

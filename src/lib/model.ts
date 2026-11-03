@@ -9,6 +9,13 @@ export type InjuryStatus =
   | "SUSPENDED"
   | "UNKNOWN";
 
+// What the player did in his NFL game that week, from the ESPN box score.
+// Missing on snapshots captured before it was recorded.
+export interface BoxLine {
+  played: boolean;
+  line: string;
+}
+
 export interface PlayerLine {
   playerId: string;
   name: string;
@@ -18,6 +25,7 @@ export interface PlayerLine {
   points: number;
   projected: number;
   injury: InjuryStatus;
+  box?: BoxLine;
 }
 
 export interface TeamWeek {

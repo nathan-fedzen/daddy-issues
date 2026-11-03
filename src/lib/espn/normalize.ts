@@ -9,6 +9,7 @@ import type {
   Transaction,
   TransactionItem,
 } from "@/lib/model";
+import { boxLine } from "./box-line";
 import { injuryStatus, POSITION_BY_ID, PRO_TEAM_BY_ID, SLOT_BY_ID } from "./constants";
 import {
   ACTIVITY_TYPES,
@@ -45,8 +46,8 @@ export function normalizeGames(schedule: EspnScheduleItem[]): Game[] {
       week: s.matchupPeriodId,
       homeId: String(s.home.teamId),
       awayId: String(s.away!.teamId),
-      homePoints: s.home.totalPoints,
-      awayPoints: s.away!.totalPoints,
+      homePoints: s.home.totalPointsLive ?? s.home.totalPoints,
+      awayPoints: s.away!.totalPointsLive ?? s.away!.totalPoints,
       final: s.winner !== "UNDECIDED",
     }));
 }
@@ -65,6 +66,10 @@ function projectedFor(player: EspnPlayer, week: number): number {
   return stat?.appliedTotal ?? 0;
 }
 
+function actualStats(player: EspnPlayer, week: number): Record<string, number> | undefined {
+  return player.stats?.find((s) => s.scoringPeriodId === week && s.statSourceId === 0)?.stats;
+}
+
 function normalizeEntry(e: EspnRosterEntry, week: number): PlayerLine | null {
   const player = e.playerPoolEntry?.player;
   if (!player) return null;
@@ -80,6 +85,7 @@ function normalizeEntry(e: EspnRosterEntry, week: number): PlayerLine | null {
     points: e.playerPoolEntry?.appliedStatTotal ?? 0,
     projected: projectedFor(player, week),
     injury: injuryStatus(player.injuryStatus),
+    box: boxLine(position, actualStats(player, week)),
   };
 }
 

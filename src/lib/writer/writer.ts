@@ -12,7 +12,7 @@ export interface Writer {
   write(facts: Facts): Promise<Draft>;
 }
 
-const DEFAULT_MODEL = "claude-opus-5";
+export const DEFAULT_MODEL = "claude-opus-5";
 
 export class ClaudeWriter implements Writer {
   private readonly client = new Anthropic();

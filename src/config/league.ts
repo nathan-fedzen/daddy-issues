@@ -16,6 +16,8 @@ export interface LeagueConfig {
   // Display names for the weekly awards; what each one is for is in
   // src/lib/awards.ts.
   trophies?: Record<"belt" | "dumpster" | "couch" | "lucky" | "robbed" | "hammer" | "churn" | "chug", string>;
+  // Weekly pick'em: the slate opens Tuesday and locks Thursday at lockHour (Denver).
+  picks: { weekOneThursday: string; firstWeek: number; lastWeek: number; lockHour: number };
   teams: Record<string, TeamBible>;
   rivalries: string[];
   runningBits: string[];
@@ -33,6 +35,7 @@ export const league: LeagueConfig = {
   heat: 4,
   villainTeamId: "7",
   robot: { teamId: "5", name: "Muse AI" },
+  picks: { weekOneThursday: "2026-09-10", firstWeek: 9, lastWeek: 18, lockHour: 18 },
   trophies: {
     belt: "The Belt",
     dumpster: "The Dumpster",
