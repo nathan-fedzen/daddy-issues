@@ -14,7 +14,7 @@ export interface PlayoffSim {
   odds: PlayoffOdds[];
 }
 
-function mulberry32(seed: number): () => number {
+export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
     a = (a + 0x6d2b79f5) >>> 0;
@@ -25,7 +25,7 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-function gaussian(rand: () => number): number {
+export function gaussian(rand: () => number): number {
   const u = Math.max(rand(), 1e-12);
   const v = rand();
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
@@ -43,7 +43,7 @@ const SD_FLOOR = 20;
 // Early in the season a team's sample is tiny, so the mean is shrunk toward
 // the league average as if it had PRIOR_GAMES extra average games, and the
 // spread has a floor. Keeps a 4-0 start from reading as a lock.
-function distribution(scores: number[], leagueMean: number): { mean: number; sd: number } {
+export function distribution(scores: number[], leagueMean: number): { mean: number; sd: number } {
   if (scores.length === 0) return { mean: leagueMean, sd: SD_FLOOR };
   const raw = scores.reduce((a, b) => a + b, 0) / scores.length;
   const mean = (raw * scores.length + leagueMean * PRIOR_GAMES) / (scores.length + PRIOR_GAMES);

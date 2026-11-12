@@ -21,6 +21,7 @@ export function IssuePage({ issue, archive }: { issue: Issue; archive: IssueSumm
         links={[
           { href: "/picks", label: "Picks" },
           { href: "/season", label: "Season" },
+          { href: "/scenarios", label: "Scenarios" },
         ]}
       />
       <main className="mx-auto max-w-[42rem] px-5 pb-20">

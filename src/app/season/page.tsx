@@ -26,7 +26,7 @@ export default async function SeasonPage() {
   if (!latest) {
     return (
       <>
-        <Masthead links={[{ href: "/", label: "Latest issue" }, { href: "/picks", label: "Picks" }]} />
+        <Masthead links={[{ href: "/", label: "Latest issue" }, { href: "/picks", label: "Picks" }, { href: "/scenarios", label: "Scenarios" }]} />
         <main className="mx-auto max-w-[42rem] px-5 py-16">
           <h1 className="headline">No season yet.</h1>
           <p className="mt-4 max-w-[36rem]">The tables fill in once the first issue is published.</p>
@@ -41,7 +41,7 @@ export default async function SeasonPage() {
 
   return (
     <>
-      <Masthead links={[{ href: "/", label: "Latest issue" }, { href: "/picks", label: "Picks" }]} />
+      <Masthead links={[{ href: "/", label: "Latest issue" }, { href: "/picks", label: "Picks" }, { href: "/scenarios", label: "Scenarios" }]} />
       <main className="mx-auto max-w-[42rem] px-5 pb-20">
         <h1 className="headline mt-8 mb-4">The season so far</h1>
         <p className="max-w-[36rem]">
