@@ -80,6 +80,7 @@ export default async function PicksPage({ searchParams }: PageProps<"/picks">) {
         links={[
           { href: "/", label: "Latest issue" },
           { href: "/season", label: "Season" },
+          { href: "/scenarios", label: "Scenarios" },
         ]}
       />
       <PicksBanner

@@ -9,7 +9,8 @@ Weekly roast newsletter site for the Mile High Daddy and Subs fantasy football l
 3. `src/lib/research` picks the players whose week needs explaining (zeros, no-shows, busts, booms, benched stars, injured starters) and has Claude look up what happened in their NFL games with web search. The notes go onto the facts sheet.
 4. `src/lib/writer` hands the facts sheet and a style guide to Claude and gets the issue back as Markdown. The prompt forbids inventing numbers that are not in the facts, and whether a player played comes only from the box score and the research notes.
 5. `src/lib/issues` stores each issue as JSON, on disk locally and in Vercel Blob in production. `src/lib/picks` does the same for the weekly pick'em: the league picks every winner on `/picks` before Thursday 6pm Denver, the page then shows live scores with everyone's pick under each side, and the graded results feed the next issue.
-6. The Next.js app renders the latest published issue at `/`, any issue at `/week/N`, and a review page at `/review/N?key=...` where drafts get published or regenerated.
+6. `src/lib/scenarios` works out the playoff race for `/scenarios`: pick an owner and see, week by week, a set of results that guarantees them a spot and a set that guarantees they miss (`routes.ts`, built on the arithmetic in `exact.ts`). Games a route does not need show which side nudges the odds, from simulated finishes (`engine.ts`).
+7. The Next.js app renders the latest published issue at `/`, any issue at `/week/N`, and a review page at `/review/N?key=...` where drafts get published or regenerated.
 
 ## Setup
 

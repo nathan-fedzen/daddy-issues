@@ -8,5 +8,6 @@ Weekly roast newsletter site for Nathan's ESPN fantasy league. Next.js App Route
 - The research desk (`src/lib/research`) looks up the NFL games with web search and writes notes into `facts.research` before the writer runs. Lead selection is pure and tested; `ROAST_RESEARCH=off` skips it.
 - With the Blob token in `.env.local`, `npm run generate` writes to production. Use `--local` for `data/issues`.
 - Pick'em lives in `src/lib/picks` (time, store, grading all pure and tested) and `src/app/picks`. Lock time and first week are in `league.picks`.
+- Playoff scenarios live in `src/lib/scenarios` and `src/app/scenarios`. `exact.ts` only claims what holds in every outcome (ties count against the claim); `engine.ts` is the simulation; `routes.ts` searches the exact math for a set of results that guarantees a team in or out. Keep the two apart: a percentage is never shown as a guarantee.
 - `scripts/build-fixture-week4.mjs` is a one-off converter kept for provenance of the seed fixture.
 - `npm test`, `npm run typecheck`, `npm run lint` must pass before calling work done.
